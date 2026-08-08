@@ -1,4 +1,5 @@
 import random
+import subprocess
 import qai_hub
 
 from qai_hub_models.models.ffnet_40s import Model
@@ -50,6 +51,11 @@ print(stats)
 ## ------------------------------------------------------ ##
 ai_hub_api_token = get_ai_hub_api_token()
 
+subprocess.run(["qai-hub", "configure", "--api_token", str(ai_hub_api_token)])
+
+## ------------------------------------------------------ ##
+subprocess.run(["python", "-m", "qai_hub_models.models.ffnet_40s.demo"])
+
 ## ------------------------------------------------------ ##
 devices = ["Samsung Galaxy S22 Ultra 5G",
             "Samsung Galaxy S22 5G",
@@ -67,3 +73,11 @@ devices = ["Samsung Galaxy S22 Ultra 5G",
 
 selected_device = random.choice(devices)
 print(selected_device)
+
+## ------------------------------------------------------ ##
+subprocess.run(["python", "-m", "qai_hub_models.models.ffnet_40s.export", "--", "--device",
+                selected_device])
+
+## ------------------------------------------------------ ##
+subprocess.run(["python", "-m", "qai_hub_models.models.ffnet_40s.demo", "--", "--device",
+                selected_device, "--on-device"])
