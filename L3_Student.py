@@ -1,4 +1,5 @@
 import random
+import subprocess
 import qai_hub
 import qai_hub_models
 import torch
@@ -6,6 +7,7 @@ import torch
 from qai_hub_models.models.ffnet_40s import Model as FFNet_40s
 from qai_hub_models.utils.printing import (print_inference_metrics, print_profile_metrics_from_job)
 from utils import get_ai_hub_api_token
+
 
 ## ------------------------------------------------------ ##
 ffnet_40s = FFNet_40s.from_pretrained()
@@ -22,6 +24,8 @@ print(traced_model)
 
 ## ------------------------------------------------------ ##
 ai_hub_api_token = get_ai_hub_api_token()
+
+subprocess.run(["qai-hub", "configure", "--api_token", str(ai_hub_api_token)])
 
 ## ------------------------------------------------------ ##
 for device in qai_hub.get_devices():
