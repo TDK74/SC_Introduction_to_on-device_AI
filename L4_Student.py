@@ -19,9 +19,7 @@ from utils import get_ai_hub_api_token
 ## ------------------------------------------------------ ##
 input_shape = (1, 3, 1024, 2048)
 
-dataset = load_dataset("UrbanSyn/UrbanSyn",
-                        split = "train",
-                        data_files = "rgb/*_00*.png")
+dataset = load_dataset("UrbanSyn/UrbanSyn", split = "train", data_files = "rgb/*_00*.png")
 dataset = dataset.train_test_split(1)
 calibration_dataset = dataset["train"]
 test_dataset = dataset["test"]
@@ -38,25 +36,17 @@ print(test_sample)
 
 ## ------------------------------------------------------ ##
 def postprocess(output_tensor, input_image_pil):
-    output_tensor_upsampled = F.interpolate(
-                                            output_tensor,
-                                            input_shape[2 : ],
-                                            mode = "bilinear",
-                                            )
+    output_tensor_upsampled = F.interpolate(output_tensor, input_shape[2 : ], mode = "bilinear", )
 
-    output_predictions = (output_tensor_upsampled[0].
-                        argmax(0).byte().detach().
-                        numpy().astype(np.uint8))
+    output_predictions = (output_tensor_upsampled[0].argmax(0).byte().detach().numpy().
+                            astype(np.uint8))
 
     color_mask = Image.fromarray(output_predictions).convert("P")
 
-    palette = [
-                128, 64, 128, 244, 35, 232, 70, 70, 70, 102, 102, 156,
-                190, 153, 153, 153, 153, 153, 250, 170, 30, 220, 220, 0,
-                107, 142, 35, 152, 251, 152, 70, 130, 180, 220, 20, 60,
-                255, 0, 0, 0, 0, 142, 0, 0, 70, 0, 60, 100, 0, 80, 100,
-                0, 0, 230, 119, 11, 32
-                ]
+    palette = [128, 64, 128, 244, 35, 232, 70, 70, 70, 102, 102, 156, 190, 153, 153, 153, 153, 153,
+               250, 170, 30, 220, 220, 0, 107, 142, 35, 152, 251, 152, 70, 130, 180, 220, 20, 60,
+               255, 0, 0, 0, 0, 142, 0, 0, 70, 0, 60, 100, 0, 80, 100, 0, 0, 230, 119, 11, 32]
+
     palette = palette + (256 * 3 - len(palette)) * [0]
     color_mask.putpalette(palette)
     out = Image.blend(input_image_pil, color_mask.convert("RGB"), 0.5)
@@ -75,20 +65,18 @@ postprocess(test_output_fp32, test_sample_pil)
 fold_all_batch_norms(model, [input_shape])
 model = prepare_model(model)
 
-quant_sim = QuantizationSimModel(
-                                model,
+quant_sim = QuantizationSimModel(model,
                                 quant_scheme = "tf_enhanced",
                                 default_param_bw = 8,
                                 default_output_bw = 8,
                                 config_file = FFNET_AIMET_CONFIG,
-                                dummy_input = torch.rand(input_shape),
-                                )
+                                dummy_input = torch.rand(input_shape), )
 
 ## ------------------------------------------------------ ##
 size = 5
 
 def pass_calibration_data(sim_model: torch.nn.Module, args):
-    (dataset,) = args
+    (dataset, ) = args
 
     with torch.no_grad():
         for sample in dataset.select(range(size)):
@@ -107,8 +95,7 @@ postprocess(test_output_int8, test_sample_pil)
 ai_hub_api_token = get_ai_hub_api_token()
 
 ## ------------------------------------------------------ ##
-devices = [
-            "Samsung Galaxy S22 Ultra 5G",
+devices = ["Samsung Galaxy S22 Ultra 5G",
             "Samsung Galaxy S22 5G",
             "Samsung Galaxy S22+ 5G",
             "Samsung Galaxy Tab S8",
@@ -120,8 +107,7 @@ devices = [
             "Samsung Galaxy S23 Ultra",
             "Samsung Galaxy S24",
             "Samsung Galaxy S24 Ultra",
-            "Samsung Galaxy S24+",
-            ]
+            "Samsung Galaxy S24+", ]
 
 selected_device = random.choice(devices)
 print(selected_device)
