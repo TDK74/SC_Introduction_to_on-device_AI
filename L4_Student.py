@@ -1,4 +1,5 @@
 import random
+import subprocess
 import numpy as np
 import qai_hub
 import qai_hub_models
@@ -93,6 +94,8 @@ postprocess(test_output_int8, test_sample_pil)
 
 ## ------------------------------------------------------ ##
 ai_hub_api_token = get_ai_hub_api_token()
+
+subprocess.run(["qai-hub", "configure", "--api_token", str(ai_hub_api_token)])
 
 ## ------------------------------------------------------ ##
 devices = ["Samsung Galaxy S22 Ultra 5G",
